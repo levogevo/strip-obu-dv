@@ -81,7 +81,7 @@ done:
   return retval;
 }
 
-static inline void PrintProgress(const size_t current, const size_t total,
+void PrintProgress(const size_t current, const size_t total,
                                  const uint32_t numObuDV,
                                  const time_t startTime) {
   time_t timeNow = time(NULL);
@@ -287,8 +287,12 @@ int32_t main(int32_t argc, char **argv) {
     }
   }
 
-  printf("\ntotal OBU read:%ld\n", numObu);
+  printf("\r                                             \r");
+  printf("total OBU read:%ld\n", numObu);
   printf("total DV OBU read:%ld\n", numObuDV);
+  time_t timeNow = time(NULL);
+  double timeElapsed = difftime(timeNow, startTime);
+  printf("total processing time:%.0f seconds\n", timeElapsed);
 
 done:
   if (NULL != buf) {
