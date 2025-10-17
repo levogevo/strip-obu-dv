@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # set defaults
 CMAKE_FLAGS=('-DCMAKE_BUILD_TYPE=Release')
@@ -36,15 +36,16 @@ done
 
 # build
 buildDir="$PWD/build"
-test -d "${buildDir}" || mkdir "${buildDir}"
+test -d "${buildDir}" && rm -rf "${buildDir}"
+mkdir "${buildDir}"
 (
 	cmake \
-		--fresh \
 		"${CMAKE_FLAGS[@]}" \
 		-B "${buildDir}" || exit 1
 	cmake \
 		--build "${buildDir}" || exit 1
 ) >"${buildDir}"/build-log 2>&1
+
 test $? -eq 0 || {
 	cat "${buildDir}"/build-log
 	exit 1

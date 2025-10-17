@@ -11,14 +11,17 @@ include(ExternalProject)
 set(OBUPARSE_SRC "${CMAKE_SOURCE_DIR}/obuparse")
 set(OBUPARSE_BINARY_DIR "${CMAKE_BINARY_DIR}/obuparse")
 file(COPY "${OBUPARSE_SRC}/" DESTINATION "${OBUPARSE_BINARY_DIR}/")
+set(OBUPARSE_LIB "libobuparse.a")
+set(OBUPARSE_LIB_PATH "${OBUPARSE_BINARY_DIR}/${OBUPARSE_LIB}")
 ExternalProject_Add(
   obuparse
   SOURCE_DIR "${OBUPARSE_SRC}"
   BINARY_DIR "${OBUPARSE_BINARY_DIR}"
   CONFIGURE_COMMAND ""
-  INSTALL_COMMAND "")
-set(OBUPARSE_LIB "${OBUPARSE_BINARY_DIR}/libobuparse.a")
-target_link_libraries(${PROJECT_NAME} PRIVATE ${OBUPARSE_LIB})
+  INSTALL_COMMAND ""
+  BUILD_COMMAND make ${OBUPARSE_LIB})
+add_dependencies(${PROJECT_NAME} obuparse)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OBUPARSE_LIB_PATH})
 
 set(COMPILE_OPTS "-Wall" "-Werror")
 if(ASAN AND UBSAN)

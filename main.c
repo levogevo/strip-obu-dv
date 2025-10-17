@@ -82,8 +82,7 @@ done:
 }
 
 void PrintProgress(const size_t current, const size_t total,
-                                 const uint32_t numObuDV,
-                                 const time_t startTime) {
+                   const size_t numObuDV, const time_t startTime) {
   time_t timeNow = time(NULL);
   double timeElapsed = difftime(timeNow, startTime);
   double progress = (double)current / (double)total;
@@ -91,7 +90,7 @@ void PrintProgress(const size_t current, const size_t total,
   double ETA = estimatedTotalTime - timeElapsed;
 
   printf("\r                                             ");
-  printf("\r%.2f%%, ETA: %.0f, %d DV OBU", (progress * 100), ETA, numObuDV);
+  printf("\r%.2f%%, ETA: %.0f, %ld DV OBU", (progress * 100), ETA, numObuDV);
   fflush(stdout);
   return;
 }
@@ -194,8 +193,8 @@ int32_t main(int32_t argc, char **argv) {
   static OBPError err = {.error = &errBuf[0], .size = sizeof(errBuf)};
 
   const time_t startTime = time(NULL);
-  static uint64_t numObu = 0;
-  static uint64_t numObuDV = 0;
+  static size_t numObu = 0;
+  static size_t numObuDV = 0;
   static size_t bufInd = 0;
   static size_t numBytesRead = 0;
   size_t remainingBufSize = (CHUNK_SIZE - bufInd);
