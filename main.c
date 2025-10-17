@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -14,7 +15,8 @@ void usage(char *progname) {
   printf("incorrect usage\n");
   printf("%s -i input.obu [options]\n", progname);
   printf("options:\n");
-  printf("\t-c <num>\tset chunk size in bytes (default %ld)\n", CHUNK_SIZE);
+  printf("\t-c <num>\tset chunk size in bytes (default %" PRIu64 ")\n",
+         CHUNK_SIZE);
   printf("\t-o <outfile>\toutput to a file without DV OBU\n");
   return;
 }
@@ -34,7 +36,7 @@ int32_t ReadNextChunk(uint8_t *buf, const size_t bufSize,
 
   freadSize = fread(buf, sizeof(buf[0]), readSize, fp);
   if ((freadSize != readSize) && !(ftell(fp) == fileSize)) {
-    printf("failed to fread %ld bytes\n", readSize);
+    printf("failed to fread %" PRIu64 " bytes\n", readSize);
     goto done;
   }
 
@@ -90,7 +92,8 @@ void PrintProgress(const size_t current, const size_t total,
   double ETA = estimatedTotalTime - timeElapsed;
 
   printf("\r                                             ");
-  printf("\r%.2f%%, ETA: %.0f, %ld DV OBU", (progress * 100), ETA, numObuDV);
+  printf("\r%.2f%%, ETA: %.0f, %" PRIu64 " DV OBU", (progress * 100), ETA,
+         numObuDV);
   fflush(stdout);
   return;
 }
@@ -154,8 +157,8 @@ int32_t main(int32_t argc, char **argv) {
   rewind(inFP);
 
   printf("input:%s\n", inPath);
-  printf("input size:%ld\n", inputSize);
-  printf("chunk size:%ld\n", CHUNK_SIZE);
+  printf("input size:%" PRIu64 "\n", inputSize);
+  printf("chunk size:%" PRIu64 "\n", CHUNK_SIZE);
   printf("output:%s\n", outPath);
 
   // create buffer
@@ -211,8 +214,8 @@ int32_t main(int32_t argc, char **argv) {
                              inFP, inputSize);
       if (0 != retval) {
         printf("error ReadNextChunk\n");
-        printf("bufInd:%ld\n", bufInd);
-        printf("remainingBufSize:%ld\n", remainingBufSize);
+        printf("bufInd:%" PRIu64 "\n", bufInd);
+        printf("remainingBufSize:%" PRIu64 "\n", remainingBufSize);
         retval = 1;
         goto done;
       }
@@ -233,8 +236,8 @@ int32_t main(int32_t argc, char **argv) {
                                inFP, inputSize);
         if (0 != retval) {
           printf("error ReadNextChunk\n");
-          printf("bufInd:%ld\n", bufInd);
-          printf("remainingBufSize:%ld\n", remainingBufSize);
+          printf("bufInd:%" PRIu64 "\n", bufInd);
+          printf("remainingBufSize:%" PRIu64 "\n", remainingBufSize);
           retval = 1;
           goto done;
         }
@@ -245,8 +248,8 @@ int32_t main(int32_t argc, char **argv) {
       printf("\n\nerror obp_get_next_obu\n");
       printf("%s\n", errBuf);
       retval = 1;
-      printf("remaining buffer size:%ld\n", remainingBufSize);
-      printf("OBU size:%ld\n", obu_size);
+      printf("remaining buffer size:%" PRIu64 "\n", remainingBufSize);
+      printf("OBU size:%" PRIu64 "\n", obu_size);
       printf("try increasing chunk size\n");
       break;
     }
@@ -269,7 +272,8 @@ int32_t main(int32_t argc, char **argv) {
       size_t fwriteSize =
           fwrite(&buf[bufInd], sizeof(buf[0]), totalObuSize, outFP);
       if (totalObuSize != fwriteSize) {
-        printf("error fwrite wrote %ld/%ld bytes\n", fwriteSize, totalObuSize);
+        printf("error fwrite wrote %" PRIu64 "/%" PRIu64 " bytes\n", fwriteSize,
+               totalObuSize);
         retval = 1;
         break;
       }
@@ -287,8 +291,8 @@ int32_t main(int32_t argc, char **argv) {
   }
 
   printf("\r                                             \r");
-  printf("total OBU read:%ld\n", numObu);
-  printf("total DV OBU read:%ld\n", numObuDV);
+  printf("total OBU read:%" PRIu64 "\n", numObu);
+  printf("total DV OBU read:%" PRIu64 "\n", numObuDV);
   time_t timeNow = time(NULL);
   double timeElapsed = difftime(timeNow, startTime);
   printf("total processing time:%.0f seconds\n", timeElapsed);

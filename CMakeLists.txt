@@ -19,7 +19,8 @@ ExternalProject_Add(
   BINARY_DIR "${OBUPARSE_BINARY_DIR}"
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND ""
-  BUILD_COMMAND make ${OBUPARSE_LIB})
+  BUILD_COMMAND make ${OBUPARSE_LIB}
+  BUILD_BYPRODUCTS "${OBUPARSE_LIB_PATH}")
 add_dependencies(${PROJECT_NAME} obuparse)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OBUPARSE_LIB_PATH})
 
@@ -27,7 +28,7 @@ set(COMPILE_OPTS "-Wall" "-Werror")
 if(ASAN AND UBSAN)
   message(FATAL_ERROR "cannot enable both ASAN and UBSAN")
 elseif(ASAN)
-  list(APPEND COMPILE_OPTS "-fsanitize=address" "-fsanitize=leak")
+  list(APPEND COMPILE_OPTS "-fsanitize=address")
 elseif(UBSAN)
   list(APPEND COMPILE_OPTS "-fsanitize=undefined")
 endif(ASAN AND UBSAN)
