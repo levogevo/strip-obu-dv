@@ -273,7 +273,7 @@ int32_t main(int32_t argc, char **argv) {
       printf("remaining buffer size:%" PRIu64 "\n", remainingBufSize);
       printf("OBU size:%" PRIu64 "\n", obu_size);
       printf("try increasing chunk size\n");
-      break;
+      goto done;
     }
 
     const uint64_t totalObuSize = offset + obu_size;
@@ -286,7 +286,7 @@ int32_t main(int32_t argc, char **argv) {
     if (0 != retval) {
       printf("error IsDolbyVisionOBU\n");
       retval = 1;
-      break;
+      goto done;
     }
     if (isDolbyVision) {
       numObuDV++;
@@ -297,7 +297,7 @@ int32_t main(int32_t argc, char **argv) {
         printf("error fwrite wrote %" PRIu64 "/%" PRIu64 " bytes\n", fwriteSize,
                totalObuSize);
         retval = 1;
-        break;
+        goto done;
       }
     }
 
