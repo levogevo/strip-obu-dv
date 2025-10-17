@@ -66,7 +66,9 @@ Building is done with cmake:
 cmake -B build
 cmake --build build
 ```
-Alternatively, use the [build script](scripts/build.sh). Built and tested on:
+Alternatively, use the [build script](scripts/build.sh): `./scripts/build.sh`
+
+Built and tested on:
 - x86_64-pc-msys
 - x86_64-pc-linux-gnu
 - aarch64-unknown-linux-gnu

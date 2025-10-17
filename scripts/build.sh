@@ -54,8 +54,6 @@ test $? -eq 0 || {
 	exit 1
 }
 
-# call first time just to prepare the binary
-# windows/macos has slow start for first run
 bin="${buildDir}/strip-obu-dv"
 
 # test
@@ -68,6 +66,8 @@ TESTS=(
 	"${bin} -i test-data/dv-removed.obu"
 )
 
+# call first time just to prepare the binary
+# windows/macos has slow start for first run
 "${bin}" >/dev/null 2>&1
 
 for test in "${TESTS[@]}"; do
