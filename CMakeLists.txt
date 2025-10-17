@@ -6,6 +6,12 @@ option(UBSAN "Compile with UndefinedBehaviorSanitizer" OFF)
 
 add_executable(${PROJECT_NAME} main.c)
 
+set(COMPILE_OPTS "-Wall" "-Werror")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  list(APPEND COMPILE_OPTS "-O3" "-flto")
+endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+
 # obuparse
 include(ExternalProject)
 set(OBUPARSE_SRC "${CMAKE_SOURCE_DIR}/obuparse")
@@ -24,7 +30,6 @@ ExternalProject_Add(
 add_dependencies(${PROJECT_NAME} obuparse)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OBUPARSE_LIB_PATH})
 
-set(COMPILE_OPTS "-Wall" "-Werror")
 if(ASAN AND UBSAN)
   message(FATAL_ERROR "cannot enable both ASAN and UBSAN")
 elseif(ASAN)
