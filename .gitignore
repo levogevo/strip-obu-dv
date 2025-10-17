@@ -1,0 +1,15 @@
+# submodule
+obuparse/*
+
+# build
+build/*
+
+# test data
+*.obu
+*.mkv
+*.mp4
+
+# flamegraph
+perf.data*
+flamegraph.svg
+
