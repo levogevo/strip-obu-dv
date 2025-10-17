@@ -5,9 +5,9 @@ obuparse/*
 build/*
 
 # test data
-*.obu
-*.mkv
-*.mp4
+/*.obu
+/*.mkv
+/*.mp4
 
 # flamegraph
 perf.data*
