@@ -8,7 +8,7 @@
 
 #include "obuparse/obuparse.h"
 
-static size_t CHUNK_SIZE = (sizeof(uint8_t) * 500 * 1000);
+static uint64_t CHUNK_SIZE = (sizeof(uint8_t) * 500 * 1000);
 #define ERROR_BUFFER_SIZE 128
 
 void usage(char *progname) {
@@ -21,12 +21,12 @@ void usage(char *progname) {
   return;
 }
 
-int32_t ReadNextChunk(uint8_t *buf, const size_t bufSize,
-                      const size_t chunkSize, FILE *fp,
+int32_t ReadNextChunk(uint8_t *buf, const uint64_t bufSize,
+                      const uint64_t chunkSize, FILE *fp,
                       const int64_t fileSize) {
   int32_t retval = 1;
-  size_t freadSize = 0;
-  size_t readSize = 0;
+  uint64_t freadSize = 0;
+  uint64_t readSize = 0;
 
   if (fileSize < chunkSize) {
     readSize = fileSize;
@@ -57,7 +57,7 @@ int32_t IsDolbyVisionOBU(uint8_t *buf, const int64_t bufSize,
   }
 
   OBPMetadata metadata = {0};
-  retval = obp_parse_metadata(buf, bufSize, &metadata, err);
+  retval = obp_parse_metadata(buf, (size_t)bufSize, &metadata, err);
   if (0 != retval) {
     printf("error obp_parse_metadata\n");
     printf("%s\n", err->error);
@@ -83,8 +83,8 @@ done:
   return retval;
 }
 
-void PrintProgress(const size_t current, const size_t total,
-                   const size_t numObuDV, const time_t startTime) {
+void PrintProgress(const uint64_t current, const uint64_t total,
+                   const uint64_t numObuDV, const time_t startTime) {
   time_t timeNow = time(NULL);
   double timeElapsed = difftime(timeNow, startTime);
   double progress = (double)current / (double)total;
@@ -153,7 +153,7 @@ int32_t main(int32_t argc, char **argv) {
 
   // get size of input
   fseek(inFP, 0, SEEK_END);
-  const size_t inputSize = ftell(inFP);
+  const uint64_t inputSize = ftell(inFP);
   rewind(inFP);
 
   printf("input:%s\n", inPath);
@@ -188,7 +188,7 @@ int32_t main(int32_t argc, char **argv) {
 
   static OBPOBUType obu_type = {0};
   static ptrdiff_t offset = {0};
-  static size_t obu_size = 0;
+  static uint64_t obu_size = 0;
   static int temporal_id = 0;
   static int spatial_id = 0;
   // setup error message buffer
@@ -196,11 +196,11 @@ int32_t main(int32_t argc, char **argv) {
   static OBPError err = {.error = &errBuf[0], .size = sizeof(errBuf)};
 
   const time_t startTime = time(NULL);
-  static size_t numObu = 0;
-  static size_t numObuDV = 0;
-  static size_t bufInd = 0;
-  static size_t numBytesRead = 0;
-  size_t remainingBufSize = (CHUNK_SIZE - bufInd);
+  static uint64_t numObu = 0;
+  static uint64_t numObuDV = 0;
+  static uint64_t bufInd = 0;
+  static uint64_t numBytesRead = 0;
+  uint64_t remainingBufSize = (CHUNK_SIZE - bufInd);
 
   while (numBytesRead < inputSize) {
     PrintProgress(numBytesRead, inputSize, numObuDV, startTime);
@@ -209,7 +209,7 @@ int32_t main(int32_t argc, char **argv) {
     if ((bufInd * 2) > CHUNK_SIZE) {
       memmove(&buf[0], &buf[bufInd], remainingBufSize);
       bufInd = 0;
-      size_t freeBufSpace = CHUNK_SIZE - remainingBufSize;
+      uint64_t freeBufSpace = CHUNK_SIZE - remainingBufSize;
       retval = ReadNextChunk(&buf[remainingBufSize], freeBufSpace, CHUNK_SIZE,
                              inFP, inputSize);
       if (0 != retval) {
@@ -223,15 +223,15 @@ int32_t main(int32_t argc, char **argv) {
     }
 
     // find next obu header
-    retval =
-        obp_get_next_obu(&buf[bufInd], remainingBufSize, &obu_type, &offset,
-                         &obu_size, &temporal_id, &spatial_id, &err);
+    retval = obp_get_next_obu(&buf[bufInd], (size_t)remainingBufSize, &obu_type,
+                              &offset, (size_t *)&obu_size, &temporal_id,
+                              &spatial_id, &err);
     if (0 != retval) {
       // read next chunk if next OBU is possibly in next chunk
       if ((obu_size < CHUNK_SIZE) && (obu_size > remainingBufSize)) {
         memmove(&buf[0], &buf[bufInd], remainingBufSize);
         bufInd = 0;
-        size_t freeBufSpace = CHUNK_SIZE - remainingBufSize;
+        uint64_t freeBufSpace = CHUNK_SIZE - remainingBufSize;
         retval = ReadNextChunk(&buf[remainingBufSize], freeBufSpace, CHUNK_SIZE,
                                inFP, inputSize);
         if (0 != retval) {
@@ -254,11 +254,11 @@ int32_t main(int32_t argc, char **argv) {
       break;
     }
 
-    const size_t totalObuSize = offset + obu_size;
+    const uint64_t totalObuSize = offset + obu_size;
 
     // check if DV
     bool isDolbyVision = false;
-    size_t obuDataInd = bufInd + offset;
+    uint64_t obuDataInd = bufInd + offset;
     retval = IsDolbyVisionOBU(&buf[obuDataInd], (remainingBufSize - offset),
                               obu_type, &err, &isDolbyVision);
     if (0 != retval) {
@@ -269,7 +269,7 @@ int32_t main(int32_t argc, char **argv) {
     if (isDolbyVision) {
       numObuDV++;
     } else if (NULL != outFP) {
-      size_t fwriteSize =
+      uint64_t fwriteSize =
           fwrite(&buf[bufInd], sizeof(buf[0]), totalObuSize, outFP);
       if (totalObuSize != fwriteSize) {
         printf("error fwrite wrote %" PRIu64 "/%" PRIu64 " bytes\n", fwriteSize,
