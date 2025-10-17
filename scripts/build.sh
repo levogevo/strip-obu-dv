@@ -65,8 +65,8 @@ for test in "${TESTS[@]}"; do
 	if [[ ${PREPEND[0]} == 'valgrind' ]]; then
 		# intentional word splitting
 		# shellcheck disable=SC2086
-		"${PREPEND[@]}" ${test}
+		"${PREPEND[@]}" ${test} || exit 1
 	else
-		"${PREPEND[@]}" "${test}"
+		"${PREPEND[@]}" "${test}" || exit 1
 	fi
 done

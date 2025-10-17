@@ -144,7 +144,7 @@ int32_t main(int32_t argc, char **argv) {
   }
 
   // open input
-  inFP = fopen(inPath, "r");
+  inFP = fopen(inPath, "rb");
   if (NULL == inFP) {
     perror("could not open input file");
     retval = 1;
@@ -178,7 +178,7 @@ int32_t main(int32_t argc, char **argv) {
 
   // open optional output
   if (NULL != outPath) {
-    outFP = fopen(outPath, "w+");
+    outFP = fopen(outPath, "w+b");
     if (NULL == outFP) {
       perror("could not open output file");
       retval = 1;
