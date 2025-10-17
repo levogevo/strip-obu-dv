@@ -51,15 +51,21 @@ test $? -eq 0 || {
 	exit 1
 }
 
+# call first time just to prepare the binary
+# windows/macos has slow start for first run
+bin="${buildDir}/strip-obu-dv"
+
 # test
 TESTS=(
 	# test no dv content
-	"${buildDir}/strip-obu-dv -i test-data/no-dv.obu"
+	"${bin} -i test-data/no-dv.obu"
 	# test dv content
-	"${buildDir}/strip-obu-dv -i test-data/dv.obu -o test-data/dv-removed.obu"
+	"${bin} -i test-data/dv.obu -o test-data/dv-removed.obu"
 	# test stripped dv output
-	"${buildDir}/strip-obu-dv -i test-data/dv-removed.obu"
+	"${bin} -i test-data/dv-removed.obu"
 )
+
+"${bin}" >/dev/null 2>&1
 
 for test in "${TESTS[@]}"; do
 	if [[ ${PREPEND[0]} == 'valgrind' ]]; then
