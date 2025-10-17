@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.16)
 project(strip-obu-dv)
 
 option(ASAN "Compile with AddressSanitizer" OFF)
