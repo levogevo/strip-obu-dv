@@ -8,7 +8,15 @@
 
 #include "obuparse/obuparse.h"
 
-static uint64_t CHUNK_SIZE = (sizeof(uint8_t) * 500 * 1000);
+#ifdef _WIN32
+#define FSEEK _fseeki64
+#define FTELL _ftelli64
+#else
+#define FSEEK fseeko
+#define FTELL ftello
+#endif
+
+static uint64_t CHUNK_SIZE = (sizeof(uint8_t) * 800 * 1000);
 #define ERROR_BUFFER_SIZE 128
 
 void usage(char *progname) {
@@ -19,6 +27,19 @@ void usage(char *progname) {
          CHUNK_SIZE);
   printf("\t-o <outfile>\toutput to a file without DV OBU\n");
   return;
+}
+
+uint64_t GetFileSize(FILE *fp) {
+  if (FSEEK(fp, 0, SEEK_END) != 0) {
+    return 0;
+  }
+  int64_t size = FTELL(fp);
+  rewind(fp);
+  if (0 > size) {
+    return 0;
+  } else {
+    return (uint64_t)size;
+  }
 }
 
 int32_t ReadNextChunk(uint8_t *buf, const uint64_t bufSize,
@@ -35,7 +56,7 @@ int32_t ReadNextChunk(uint8_t *buf, const uint64_t bufSize,
   }
 
   freadSize = fread(buf, sizeof(buf[0]), readSize, fp);
-  if ((freadSize != readSize) && !(ftell(fp) == fileSize)) {
+  if ((freadSize != readSize) && !(FTELL(fp) == fileSize)) {
     printf("failed to fread %" PRIu64 " bytes\n", readSize);
     goto done;
   }
@@ -152,9 +173,10 @@ int32_t main(int32_t argc, char **argv) {
   }
 
   // get size of input
-  fseek(inFP, 0, SEEK_END);
-  const uint64_t inputSize = ftell(inFP);
-  rewind(inFP);
+  const uint64_t inputSize = GetFileSize(inFP);
+  if (0 > inputSize) {
+    printf("error GetFileSize for input %s\n", inPath);
+  }
 
   printf("input:%s\n", inPath);
   printf("input size:%" PRIu64 "\n", inputSize);
