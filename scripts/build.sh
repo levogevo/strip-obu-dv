@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# submodule check
+test -f "${PWD}/obuparse/Makefile" || git submodule update --init --recursive
+
 # set defaults
 CMAKE_FLAGS=('-DCMAKE_BUILD_TYPE=Release')
 PREPEND=('bash' '-c')
@@ -35,7 +38,7 @@ for arg in "$@"; do
 done
 
 # build
-buildDir="$PWD/build"
+buildDir="${PWD}/build"
 test -d "${buildDir}" && rm -rf "${buildDir}"
 mkdir "${buildDir}"
 (
