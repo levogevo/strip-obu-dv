@@ -16,7 +16,7 @@
 #define FTELL ftello
 #endif
 
-static uint64_t CHUNK_SIZE = (sizeof(uint8_t) * 800 * 1000);
+static uint64_t CHUNK_SIZE = (16 * 1000 * 1000);
 #define ERROR_BUFFER_SIZE 128
 
 void usage(char *progname) {
@@ -152,7 +152,7 @@ int32_t main(int32_t argc, char **argv) {
         retval = 1;
         goto done;
       }
-      CHUNK_SIZE = atoi(argv[i + 1]);
+      CHUNK_SIZE = atol(argv[i + 1]);
     } else if (0 == strcmp(argv[i], "-o")) {
       if ((argc - 1) == i) {
         printf("no argument for output file\n");

@@ -18,16 +18,24 @@ usage() {
 
 input=''
 output=''
+chunk=''
 
 for arg in "$@"; do
 	case "${arg}" in
 	'-i')
 		shift
 		input="$1"
+		shift
 		;;
 	'-o')
 		shift
-		output="$2"
+		output="$1"
+		shift
+		;;
+	'-c')
+		shift
+		chunk="$1"
+		shift
 		;;
 	esac
 done
@@ -51,9 +59,16 @@ ffmpeg \
 	-f obu \
 	"${obuFile}" || exit 1
 
-strip-obu-dv \
-	-i "${obuFile}" \
-	-o "${obuNoDvFile}" || exit 1
+stripArgs=(
+	-i "${obuFile}"
+	-o "${obuNoDvFile}"
+)
+if [[ "${chunk}" != '' ]]; then
+	stripArgs+=(
+		-c "${chunk}"
+	)
+fi
+strip-obu-dv "${stripArgs[@]}" || exit 1
 rm "${obuFile}"
 
 ffmpeg \

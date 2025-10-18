@@ -4,7 +4,7 @@ Simple program to parse a file containing OBUs for Dolby Vision (DV) OBUs. If an
 
 ## Why?
 
-As of the creation of this program, ffmpeg does not have this program's features, despite being able to produce DV AV1 content through encoding (AV1 content is comprised of OBUs). As many HW decoders are simply not capable of decoding AV1 DV streams, I wanted a tool to fix this problem without any re-encoding taking place.
+~~As of the creation of this program, ffmpeg does not have this program's features, despite being able to produce DV AV1 content through encoding (AV1 content is comprised of OBUs).~~ Recent versions of ffmpeg have this program's features. View the [`dovi_rpu` bitstream filter](https://ffmpeg.org/ffmpeg-bitstream-filters.html#dovi_005frpu) for more information. As many HW decoders are simply not capable of decoding AV1 DV streams, I wanted a tool to fix this problem without any re-encoding taking place.
 
 ## Integration with ffmpeg
 This project **only parses OBU files**. Therefore, using it on an MP4/MKV file **will not work**. To strip DV content from these file types, you will need to demux with ffmpeg, then strip the OBU, then remux back into an MP4/MKV container. The [strip-with-ffmpeg.sh](scripts/strip-with-ffmpeg.sh) script does precisely that without any re-encoding taking place.
