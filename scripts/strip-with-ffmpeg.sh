@@ -73,11 +73,11 @@ rm "${obuFile}"
 
 ffmpeg \
 	-hide_banner \
-	-i "${input}" \
 	-i "${obuNoDvFile}" \
+	-i "${input}" \
 	-map 0 \
-	-map -0:v \
 	-map 1 \
+	-map -1:v \
 	-c copy \
 	"${output}" || exit 1
 rm "${obuNoDvFile}"
